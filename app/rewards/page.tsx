@@ -2,12 +2,12 @@ import Link from 'next/link';
 
 import { createClient } from '@/lib/supabase/server';
 
-import GuestBalance from './GuestBalance';
-import RewardCard, { type Reward } from './RewardCard';
+import RewardsList from './RewardsList';
+import { type Reward } from './RewardCard';
 
 export const metadata = { title: 'المكافآت — روبو سايكل' };
 
-type Summary = { ok?: boolean; points?: number; display_name?: string };
+type Summary = { ok?: boolean; points?: number };
 
 export default async function RewardsPage() {
   const supabase = createClient();
@@ -16,7 +16,6 @@ export default async function RewardsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // ثلاثة استعلامات مستقلة — تُنفَّذ معًا بدل التتابع.
   const [rewardsResult, summaryResult, leaderboardResult] = await Promise.all([
     supabase
       .from('rewards')
@@ -31,42 +30,13 @@ export default async function RewardsPage() {
   const summary = (summaryResult.data ?? null) as Summary | null;
   const leaderboard = leaderboardResult.data ?? [];
 
-  const balance = user && summary?.ok ? (summary.points ?? 0) : null;
-
   return (
     <main>
-      <div className="card">
-        <h1>المكافآت</h1>
-        <p className="sub">استبدلي نقاطك بمكافآت من شركائنا.</p>
-
-        {user ? (
-          <div className="stat">
-            <span>رصيدك</span>
-            <span>{balance ?? 0} نقطة</span>
-          </div>
-        ) : (
-          <GuestBalance />
-        )}
-
-        {!user && (
-          <p className="notice ok">
-            أنت في وضع الضيف — نقاطك محفوظة على هذا الجهاز.{' '}
-            <Link href="/enter">أنشئي حسابًا</Link> للاحتفاظ بها على كل أجهزتك.
-          </p>
-        )}
-      </div>
-
-      <div className="rewards">
-        {rewards.length === 0 ? (
-          <div className="card">
-            <p className="sub">لا توجد مكافآت متاحة حاليًا.</p>
-          </div>
-        ) : (
-          rewards.map((reward) => (
-            <RewardCard key={reward.id} reward={reward} balance={balance} />
-          ))
-        )}
-      </div>
+      <RewardsList
+        rewards={rewards}
+        serverBalance={user && summary?.ok ? (summary.points ?? 0) : null}
+        isGuest={!user}
+      />
 
       {leaderboard.length > 0 && (
         <div className="card">
