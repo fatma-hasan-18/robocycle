@@ -1,0 +1,5 @@
+project_id = "kaanfupnhyleeuiqzvvq"
+
+[functions.notify-events]
+# تتحقّق الدالة من مفتاح الخدمة بنفسها، ويستدعيها pg_net من داخل القاعدة.
+verify_jwt = false
