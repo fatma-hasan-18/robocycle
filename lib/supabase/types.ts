@@ -280,6 +280,7 @@ export type Database = {
           is_active: boolean
           name_ar: string
           sort_order: number
+          stock: number | null
           worth_kwd: number | null
         }
         Insert: {
@@ -289,6 +290,7 @@ export type Database = {
           is_active?: boolean
           name_ar: string
           sort_order?: number
+          stock?: number | null
           worth_kwd?: number | null
         }
         Update: {
@@ -298,6 +300,7 @@ export type Database = {
           is_active?: boolean
           name_ar?: string
           sort_order?: number
+          stock?: number | null
           worth_kwd?: number | null
         }
         Relationships: []
@@ -429,10 +432,12 @@ export type Database = {
         Args: { p_reward_id: string; p_wallet_key: string }
         Returns: Json
       }
+      rotate_webhook_token: { Args: never; Returns: string }
       verify_deposit: {
         Args: { p_actual_weight_kg: number; p_submission_id: string }
         Returns: number
       }
+      verify_webhook_token: { Args: { p_token: string }; Returns: boolean }
       wallet_balance: { Args: { p_wallet_key: string }; Returns: number }
     }
     Enums: {

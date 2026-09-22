@@ -32,6 +32,7 @@ lib/guest/              وضع الضيف وترحيل بياناته
 supabase/migrations/    هجرات SQL
 supabase/functions/     Edge Functions
 tests/                  اختبارات
+scripts/                أدوات التحقّق
 docs/SUPABASE.md        دليل التكامل المفصّل
 ```
 
@@ -43,6 +44,7 @@ docs/SUPABASE.md        دليل التكامل المفصّل
 | `npm run build` | بناء الإنتاج |
 | `npm run typecheck` | فحص الأنواع |
 | `npm test` | اختبارات قواعد المسارات |
+| `npm run db:verify` | تطبيق الهجرات على قاعدة فارغة للتأكّد من سلامتها |
 | `npm run db:types` | إعادة توليد `lib/supabase/types.ts` |
 
 التفاصيل الكاملة للواجهة الخلفية في **[`docs/SUPABASE.md`](docs/SUPABASE.md)**.
