@@ -413,6 +413,10 @@ export type Database = {
         Returns: number
       }
       claim_guest_wallet: { Args: { p_wallet_key: string }; Returns: Json }
+      confirm_deposit: {
+        Args: { p_deposit_code: string; p_submission_id: string }
+        Returns: Json
+      }
       dispatch_pending_events: { Args: { p_limit?: number }; Returns: number }
       get_leaderboard: {
         Args: { p_limit?: number }

@@ -128,3 +128,69 @@ button:disabled { opacity: .6; cursor: progress; }
 main > .card + .card { margin-top: 1rem; }
 h2 { font-size: 1.15rem; margin: 0 0 .25rem; }
 a { color: var(--brand); }
+
+/* -------------------------------------------------- نموذج إعادة التدوير */
+select {
+  width: 100%;
+  padding: .7rem .85rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+}
+
+label.checkbox {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+label.checkbox input { width: auto; margin: 0; }
+
+.deposit-code {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-align: center;
+  direction: ltr;
+  margin: 1rem 0 1.5rem;
+  padding: 1rem;
+  border: 2px dashed var(--brand);
+  border-radius: var(--radius);
+  color: var(--brand);
+}
+
+/* ------------------------------------------------------------ الحاويات */
+.fill { display: flex; align-items: center; gap: .75rem; }
+.fill-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.fill-value { height: 100%; border-radius: 999px; }
+.fill-low  { background: var(--brand); }
+.fill-mid  { background: #c99700; }
+.fill-high { background: var(--danger); }
+.fill-label { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+
+/* -------------------------------------------------------------- السجلّ */
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .9rem;
+}
+.history-row:last-child { border-bottom: 0; }
+.history-row .when { color: var(--muted); font-size: .8rem; }
+.history-row .delta-plus  { color: var(--brand); font-weight: 700; }
+.history-row .delta-minus { color: var(--muted); font-weight: 700; }
+
+.nav { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.nav a { flex: 1; min-width: 8rem; text-decoration: none; }

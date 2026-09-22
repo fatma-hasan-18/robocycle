@@ -25,7 +25,13 @@ supabase db push
 ## البنية
 
 ```
-app/                    صفحات Next.js (/, /enter, /rewards, /dashboard, /auth/callback)
+app/                    صفحات Next.js
+  /                     الرئيسية وأثر المجتمع
+  /recycle              مسار إعادة التدوير: فئة ← وزن ← حاوية ← رمز إيداع
+  /bins                 حاويات الاستلام ونسب امتلائها
+  /rewards              المكافآت والاستبدال ولوحة الصدارة
+  /dashboard            الرصيد والعمليات وسجلّ النقاط
+  /enter                الدخول والتسجيل ووضع الضيف
 lib/supabase/           عملاء Supabase + الأنواع المُولَّدة
 lib/auth/               Server Actions للمصادقة
 lib/guest/              وضع الضيف وترحيل بياناته

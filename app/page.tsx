@@ -41,13 +41,20 @@ export default async function HomePage({
         </div>
 
         <div className="divider" />
-        <Link href="/enter">
-          <button type="button">ابدئي الآن</button>
+        <Link href="/recycle">
+          <button type="button">أعيدي تدوير جهاز</button>
+        </Link>
+      </div>
+
+      <div className="nav">
+        <Link href="/bins">
+          <button className="secondary" type="button">الحاويات</button>
         </Link>
         <Link href="/rewards">
-          <button className="secondary" type="button" style={{ marginTop: '.5rem' }}>
-            تصفّحي المكافآت
-          </button>
+          <button className="secondary" type="button">المكافآت</button>
+        </Link>
+        <Link href="/enter">
+          <button className="secondary" type="button">حسابي</button>
         </Link>
       </div>
     </main>

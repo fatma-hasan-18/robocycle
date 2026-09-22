@@ -47,6 +47,7 @@
 | 08 | `20260922090700_reconcile_existing_rpcs.sql` | مواءمة `verify_deposit` و `redeem_reward` |
 | 09 | `20260922090800_webhook_token.sql` | رمز مصادقة خاص بمسار الأحداث + تدويره |
 | 10 | `20260922090900_reward_stock.sql` | مخزون المكافآت + الخصم الذرّي |
+| 11 | `20260922091000_submission_integrity.sql` | نزاهة التسليمات + رمز الإيداع |
 
 ---
 
@@ -245,6 +246,7 @@ lib/guest/migrate.ts        استدعاء claim_guest_wallet
 lib/auth/actions.ts         Server Actions: دخول/تسجيل/OTP/ضيف/ترقية/خروج
 lib/auth/routes.ts          قواعد المسارات المحمية ومنع الإعادة المفتوحة
 lib/rewards/actions.ts      استبدال المكافآت
+lib/recycle/actions.ts      إنشاء التسليم وتأكيد الإيداع والتوثيق
 middleware.ts               نقطة الدخول
 ```
 
@@ -281,6 +283,42 @@ cp .env.example .env.local
 على Vercel: أضيفيها في Project Settings → Environment Variables، و في Supabase
 Dashboard → Authentication → URL Configuration أضيفي نطاق الموقع إلى
 **Redirect URLs**.
+
+---
+
+## ٨.٤ نزاهة التسليمات (ثغرة أُغلقت)
+
+السياسة الموروثة كانت تسمح للعميل بتعيين `status = 'verified'` مباشرة، وعمود
+`points` يُرسَل من العميل بلا فحص. ومع إضافة مشغّل منح النقاط صار ذلك استغلالًا
+مكتملًا:
+
+```
+insert submissions (points = 999999, status = 'analyzed')
+update submissions set status = 'verified'
+→ ٩٩٩٩٩٩ نقطة بلا إعادة تدوير أي شيء
+```
+
+**بعد الإصلاح:**
+
+- `points` لا تُقبل من العميل إطلاقًا — تُصفَّر عند الإدراج وتُجمَّد عند التحديث
+- العميل لم يعد يستطيع تعيين `verified`؛ سياسة التحديث تسمح بـ
+  `analyzed → deposited` فقط
+- التوثيق يمرّ حصرًا عبر `verify_deposit` التي تحسب النقاط من فئة الجهاز
+  ووزنه عبر `calc_points`
+- كل تسليم يحصل على `deposit_code` يولّده الخادم (٦ خانات بلا أحرف ملتبسة)،
+  و`confirm_deposit` تتطلّبه للانتقال إلى `deposited`
+
+**مسار الحالة:** `analyzed → deposited → verified`
+
+**ما زال مفتوحًا عمدًا:** الوزن الفعلي يأتي من مُستدعي `verify_deposit`. في نشر
+حقيقي يستدعيها طرف الحاوية أو الموظّف لا المستخدم. لقصرها على الخادم الموثوق:
+
+```sql
+revoke execute on function public.verify_deposit(uuid, numeric)
+  from anon, authenticated;
+```
+
+تُركت متاحة للعميل الآن حتى تكتمل التجربة من طرف واحد أثناء التطوير.
 
 ---
 
