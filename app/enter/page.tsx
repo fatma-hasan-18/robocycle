@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
+import { safeInternalPath } from '@/lib/auth/routes';
 import { createClient } from '@/lib/supabase/server';
 
 import EnterForm from './EnterForm';
@@ -11,9 +12,8 @@ export default async function EnterPage({
 }: {
   searchParams: { next?: string; upgrade?: string };
 }) {
-  const rawNext = searchParams.next ?? '/dashboard';
   // منع الإعادة المفتوحة: المسارات الداخلية فقط.
-  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard';
+  const next = safeInternalPath(searchParams.next, '/dashboard');
   const upgrade = searchParams.upgrade === '1';
 
   const supabase = createClient();

@@ -7,13 +7,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
+import { isProtectedPath, isPublicPath } from '@/lib/auth/routes';
+
 import type { Database } from './types';
-
-/** مسارات تتطلّب حسابًا كاملًا (لا تكفي فيها جلسة الضيف). */
-const PROTECTED_PREFIXES = ['/dashboard', '/rewards', '/profile'];
-
-/** مسارات عامة دائمًا. */
-const PUBLIC_PREFIXES = ['/enter', '/auth', '/_next', '/favicon.ico'];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -43,12 +39,9 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
-
   // وضع الضيف محفوظ: المستخدم المجهول (is_anonymous) له جلسة صالحة ويمر
   // من هنا بلا اعتراض؛ الحماية تخصّ المسارات التي تتطلّب حسابًا كاملًا فقط.
-  if (isProtected && !isPublic) {
+  if (isProtectedPath(pathname) && !isPublicPath(pathname)) {
     if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = '/enter';

@@ -44,6 +44,7 @@
 | 06 | `20260922090500_guest_claim.sql` | `claim_guest_wallet` + `get_my_summary` |
 | 07 | `20260922090600_hardening.sql` | سحب الصلاحيات الزائدة + لوحة الصدارة |
 | 08 | `20260922090700_reconcile_existing_rpcs.sql` | مواءمة `verify_deposit` و `redeem_reward` |
+| 09 | `20260922090800_webhook_token.sql` | رمز مصادقة خاص بمسار الأحداث + تدويره |
 
 ---
 
@@ -64,9 +65,19 @@
 `updateUser({ email, password })` مع **بقاء نفس `user_id`** — أي بلا ترحيل بيانات
 إطلاقًا. مسار `localStorage` القديم يبقى مدعومًا للتوافق فقط.
 
-> تفعيل الجلسات المجهولة: Dashboard → Authentication → Sign In / Providers →
-> **Allow anonymous sign-ins**. إن بقيت معطّلة، يتراجع التطبيق تلقائيًا إلى
-> وضع الضيف المحلي (انظر `continueAsGuest` في `lib/auth/actions.ts`).
+> ⚠️ **الجلسات المجهولة معطّلة حاليًا في هذا المشروع.** تم التحقّق بنداء فعلي
+> على `/auth/v1/signup` فأعاد `anonymous_provider_disabled`. هذا الإعداد لا
+> يمكن تغييره عبر API — يلزم تفعيله من اللوحة:
+> **Dashboard → Authentication → Sign In / Providers → Allow anonymous sign-ins**.
+>
+> إلى أن يُفعَّل، يتراجع `continueAsGuest` تلقائيًا إلى وضع الضيف المحلي
+> (`localStorage`) — وهو ما كان التطبيق يعمل به أصلًا، فلا شيء ينكسر. بعد
+> التفعيل يبدأ المسار الأفضل بلا أي تغيير في الشيفرة.
+>
+> **تنبيه على وجهة الضيف:** الضيف — بجلسة مجهولة أو بدونها — لا يملك حسابًا
+> كاملًا، فوجهته لا يجوز أن تكون مسارًا محميًا وإلا أعاده middleware إلى
+> `/enter` ودار في حلقة مغلقة. تتكفّل `guestDestination` بذلك، وتغطّيها
+> اختبارات `tests/routes.test.ts`.
 
 ---
 
@@ -152,22 +163,31 @@ values (5000, 'سفير إعادة التدوير 🌟');
 نمط **outbox**: المشغّل يكتب صفًا في `notification_events` داخل المعاملة (سريع
 وموثوق)، ثم `pg_net` يستدعي Edge Function بشكل غير متزامن.
 
-### التفعيل
+### الحالة: مُفعَّل ومُختبَر ✅
+
+الهجرة 09 ولّدت رمزًا عشوائيًا (٢٥٦ بت) وخزّنته في Vault، ودالة `notify-events`
+منشورة ونشطة. لا توجد خطوة يدوية متبقية في هذا المسار.
+
+**المصادقة لا تستخدم مفتاح الخدمة.** الرمز خاص بهذا المسار وحده ولا يغادر
+القاعدة إلا في ترويسة الطلب؛ وتتحقّق منه Edge Function عبر
+`verify_webhook_token` مستخدمةً مفتاح الخدمة الذي تحقنه Supabase تلقائيًا في
+بيئتها. أي أنه لا يوجد سرّ مكتوب في الشيفرة ولا في متغيّرات البيئة.
+
+تدوير الرمز — بلا أي خطوة يدوية، فالطرفان يقرآنه من Vault:
 
 ```sql
--- الأسرار في Vault، لا في الشيفرة
-select vault.create_secret(
-  'https://kaanfupnhyleeuiqzvvq.functions.supabase.co/notify-events',
-  'robocycle_webhook_url'
-);
-select vault.create_secret('<SUPABASE_SERVICE_ROLE_KEY>', 'robocycle_webhook_token');
+select public.rotate_webhook_token();
 ```
 
-```bash
-supabase functions deploy notify-events --project-ref kaanfupnhyleeuiqzvvq
-```
+**نتيجة الاختبار الحقيقي** (حدثان عبر `verify_deposit`):
 
-قبل ضبط الأسرار تبقى الأحداث `pending` بلا فشل. لإرسال المتراكم:
+| الحالة | النتيجة |
+|---|---|
+| رمز صحيح | `200 {"ok":true}` → الحدث `sent` |
+| رمز خاطئ | `401 Unauthorized` |
+| بلا رمز | `401 Unauthorized` |
+
+لإرسال ما تراكم (بعد عطل مثلًا):
 
 ```sql
 select public.dispatch_pending_events(100);
@@ -221,6 +241,7 @@ lib/supabase/types.ts       أنواع مُولَّدة — npm run db:types
 lib/guest/wallet.ts         مفتاح المحفظة المحلي (آمن بلا localStorage)
 lib/guest/migrate.ts        استدعاء claim_guest_wallet
 lib/auth/actions.ts         Server Actions: دخول/تسجيل/OTP/ضيف/ترقية/خروج
+lib/auth/routes.ts          قواعد المسارات المحمية ومنع الإعادة المفتوحة
 middleware.ts               نقطة الدخول
 ```
 

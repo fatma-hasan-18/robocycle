@@ -5,15 +5,14 @@
  */
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { safeInternalPath } from '@/lib/auth/routes';
 import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/dashboard';
-
   // منع الإعادة المفتوحة: نقبل المسارات الداخلية فقط.
-  const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
+  const safeNext = safeInternalPath(searchParams.get('next') ?? undefined, '/dashboard');
 
   if (!code) {
     return NextResponse.redirect(`${origin}/enter?error=missing_code`);

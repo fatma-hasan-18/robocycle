@@ -2,7 +2,11 @@ import Link from 'next/link';
 
 import { createClient } from '@/lib/supabase/server';
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: { guest?: string };
+}) {
   const supabase = createClient();
 
   // إحصاءات مجتمعية: تعمل للضيف والمستخدم المسجَّل على حدّ سواء.
@@ -13,6 +17,15 @@ export default async function HomePage() {
       <div className="card">
         <h1>روبو سايكل</h1>
         <p className="sub">أعيدي تدوير أجهزتك الإلكترونية واكسبي نقاطًا ومكافآت.</p>
+
+        {/* الجلسات المجهولة معطّلة في إعدادات المشروع: نخبر الضيف أن نقاطه
+            محفوظة على هذا الجهاز فقط، بدل تركه يظن أن لديه حسابًا. */}
+        {searchParams.guest === 'local' && (
+          <p className="notice ok">
+            أنت في وضع الضيف — نقاطك محفوظة على هذا الجهاز فقط.{' '}
+            <a href="/enter">أنشئي حسابًا</a> للاحتفاظ بها على كل أجهزتك.
+          </p>
+        )}
 
         <div className="stat">
           <span>أجهزة أُعيد تدويرها</span>

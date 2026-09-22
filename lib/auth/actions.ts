@@ -11,6 +11,8 @@ import { headers } from 'next/headers';
 
 import { createClient } from '@/lib/supabase/server';
 
+import { GUEST_HOME, guestDestination, safeInternalPath } from './routes';
+
 export type AuthState = { error?: string; message?: string };
 
 function siteUrl(): string {
@@ -28,7 +30,7 @@ export async function signInWithPassword(
 ): Promise<AuthState> {
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
-  const next = String(formData.get('next') ?? '/dashboard');
+  const next = safeInternalPath(String(formData.get('next') ?? ''), '/dashboard');
 
   if (!email || !password) {
     return { error: 'البريد وكلمة المرور مطلوبان.' };
@@ -118,17 +120,21 @@ export async function signInWithOtp(
  * تتم عبر updateUser دون أي ترحيل بيانات.
  */
 export async function continueAsGuest(formData: FormData): Promise<void> {
-  const next = String(formData.get('next') ?? '/');
+  // الضيف لا يملك حسابًا كاملًا، فوجهته لا يجوز أن تكون مسارًا محميًا وإلا
+  // أعاده middleware إلى /enter فورًا ودار المستخدم في حلقة مغلقة.
+  const next = guestDestination(String(formData.get('next') ?? ''));
   const supabase = createClient();
 
   const { error } = await supabase.auth.signInAnonymously({
     options: { data: { display_name: 'ضيف' } },
   });
 
-  // فشل الجلسة المجهولة (مثلًا الميزة غير مفعّلة) لا يمنع المتابعة:
-  // التطبيق يعود إلى وضع الضيف القديم المعتمد على localStorage.
+  // الجلسات المجهولة قد تكون معطّلة في إعدادات المشروع
+  // (Authentication → Sign In / Providers → Allow anonymous sign-ins).
+  // عندها يتراجع التطبيق إلى وضع الضيف المحلي المعتمد على localStorage،
+  // وهو المسار الذي كان التطبيق يعمل به أصلًا — فلا شيء ينكسر.
   if (error) {
-    redirect(`${next}?guest=local`);
+    redirect(`${GUEST_HOME}?guest=local`);
   }
 
   revalidatePath('/', 'layout');

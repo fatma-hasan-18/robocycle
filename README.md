@@ -31,6 +31,7 @@ lib/auth/               Server Actions للمصادقة
 lib/guest/              وضع الضيف وترحيل بياناته
 supabase/migrations/    هجرات SQL
 supabase/functions/     Edge Functions
+tests/                  اختبارات
 docs/SUPABASE.md        دليل التكامل المفصّل
 ```
 
@@ -41,6 +42,7 @@ docs/SUPABASE.md        دليل التكامل المفصّل
 | `npm run dev` | خادم التطوير |
 | `npm run build` | بناء الإنتاج |
 | `npm run typecheck` | فحص الأنواع |
+| `npm test` | اختبارات قواعد المسارات |
 | `npm run db:types` | إعادة توليد `lib/supabase/types.ts` |
 
 التفاصيل الكاملة للواجهة الخلفية في **[`docs/SUPABASE.md`](docs/SUPABASE.md)**.
