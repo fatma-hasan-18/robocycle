@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 
+import Link from 'next/link';
+
 import { signOut } from '@/lib/auth/actions';
 import { createClient } from '@/lib/supabase/server';
 
@@ -61,6 +63,11 @@ export default async function DashboardPage({
         )}
 
         <div className="divider" />
+        <Link href="/rewards">
+          <button type="button" style={{ marginBottom: '.5rem' }}>
+            استبدال النقاط بمكافآت
+          </button>
+        </Link>
         <form action={signOut}>
           <button className="secondary" type="submit">
             تسجيل الخروج

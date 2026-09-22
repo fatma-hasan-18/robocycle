@@ -44,6 +44,11 @@ export default async function HomePage({
         <Link href="/enter">
           <button type="button">ابدئي الآن</button>
         </Link>
+        <Link href="/rewards">
+          <button className="secondary" type="button" style={{ marginTop: '.5rem' }}>
+            تصفّحي المكافآت
+          </button>
+        </Link>
       </div>
     </main>
   );

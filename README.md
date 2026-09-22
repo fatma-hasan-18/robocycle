@@ -25,7 +25,7 @@ supabase db push
 ## البنية
 
 ```
-app/                    صفحات Next.js (/, /enter, /dashboard, /auth/callback)
+app/                    صفحات Next.js (/, /enter, /rewards, /dashboard, /auth/callback)
 lib/supabase/           عملاء Supabase + الأنواع المُولَّدة
 lib/auth/               Server Actions للمصادقة
 lib/guest/              وضع الضيف وترحيل بياناته

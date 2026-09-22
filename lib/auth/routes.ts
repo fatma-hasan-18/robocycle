@@ -3,8 +3,14 @@
  * معًا، حتى لا تتفرّع القائمتان وتتضاربا.
  */
 
-/** مسارات تتطلّب حسابًا كاملًا (لا تكفي فيها جلسة ضيف). */
-export const PROTECTED_PREFIXES = ['/dashboard', '/rewards', '/profile'] as const;
+/**
+ * مسارات تتطلّب حسابًا كاملًا (لا تكفي فيها جلسة ضيف).
+ *
+ * ‏/rewards ليست هنا عمدًا: الضيف يملك نقاطًا حقيقية في القاعدة ويستطيع
+ * الاستبدال، فحجب الصفحة عنه يقطع المسار الأساسي للتطبيق. الحماية الفعلية
+ * في قاعدة البيانات (RLS والمشغّلات) لا في إخفاء الصفحة.
+ */
+export const PROTECTED_PREFIXES = ['/dashboard', '/profile'] as const;
 
 /** مسارات عامة دائمًا. */
 export const PUBLIC_PREFIXES = ['/enter', '/auth', '/_next', '/favicon.ico'] as const;

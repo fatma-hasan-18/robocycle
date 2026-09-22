@@ -20,9 +20,11 @@ import {
 test('المسارات المحمية تُميَّز بدقة', () => {
   assert.equal(isProtectedPath('/dashboard'), true);
   assert.equal(isProtectedPath('/dashboard/history'), true);
-  assert.equal(isProtectedPath('/rewards'), true);
+  assert.equal(isProtectedPath('/profile'), true);
   assert.equal(isProtectedPath('/'), false);
   assert.equal(isProtectedPath('/enter'), false);
+  // المكافآت عامة: الضيف يملك نقاطًا ويستطيع الاستبدال
+  assert.equal(isProtectedPath('/rewards'), false);
   // لا يُخدع بمسار يبدأ بنفس الحروف
   assert.equal(isProtectedPath('/dashboard-public'), false);
   assert.equal(isProtectedPath('/profiles-of-others'), false);
@@ -48,11 +50,11 @@ test('وجهة الضيف لا تكون مسارًا محميًا أبدًا', (
   // هذا هو جوهر حلقة إعادة التوجيه: الضيف لا يملك حسابًا كاملًا، فلو أُرسل
   // إلى /dashboard لأعاده middleware إلى /enter بلا نهاية.
   assert.equal(guestDestination('/dashboard'), GUEST_HOME);
-  assert.equal(guestDestination('/rewards'), GUEST_HOME);
   assert.equal(guestDestination('/profile/settings'), GUEST_HOME);
 
-  // المسارات العامة تُحترم كما هي
+  // المسارات العامة تُحترم كما هي — والمكافآت منها
   assert.equal(guestDestination('/'), '/');
+  assert.equal(guestDestination('/rewards'), '/rewards');
   assert.equal(guestDestination('/bins'), '/bins');
 
   // والإعادة المفتوحة ممنوعة هنا أيضًا
