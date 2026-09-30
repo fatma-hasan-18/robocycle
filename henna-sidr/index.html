@@ -577,7 +577,7 @@ footer{padding:50px 0 30px;border-top:1px solid var(--line);margin-top:90px}
       </div>
       <div>
         <h5>تواصل</h5>
-        <ul><li>واتساب: ٩٦٥٠٠٠٠٠٠٠٠+</li><li>info@henna-sidr.example</li><li>الكويت 🇰🇼</li></ul>
+        <ul><li><a href="https://wa.me/96596601459" target="_blank" rel="noopener" dir="ltr">واتساب: +965 9660 1459</a></li><li>info@henna-sidr.example</li><li>الكويت 🇰🇼</li></ul>
       </div>
     </div>
     <p class="copy">© ٢٠٢٦ دار الحِنّة والسِّدر — صُنع بحُب 🌿</p>
@@ -695,7 +695,7 @@ function renderCart(){
       <div class="qty"><button data-q="+" data-id="${c.id}">+</button><span>${ar(c.qty)}</span><button data-q="-" data-id="${c.id}">−</button></div>
     </div>`).join("") : `<div class="empty">🌿<br>سلّتك فاضية… ابدأ التسوّق</div>`;
   const lines = cart.map(c=>`• ${c.name} (${c.w}) × ${c.qty}`).join("\n");
-  $("#checkout").href = "https://wa.me/96500000000?text=" + encodeURIComponent(`مرحبًا، أبي أطلب:\n${lines}\nالمجموع: ${kd(total)}`);
+  $("#checkout").href = "https://wa.me/96596601459?text=" + encodeURIComponent(`مرحبًا، أبي أطلب:\n${lines}\nالمجموع: ${kd(total)}`);
 }
 $("#items").addEventListener("click",e=>{
   const b=e.target.closest("button[data-q]"); if(!b) return;
